@@ -1,4 +1,5 @@
 import json
+from optparse import Option
 import nltk
 import re
 import networkx as nx
@@ -20,6 +21,8 @@ sw_list = [
     'im',
     'likes',
     'go',
+    'dont'
+    '#'
 ]
 all_stopwords.extend(sw_list)
 
@@ -30,10 +33,10 @@ with open('temp.json', 'r') as json_file:
     json_load = json.load(json_file)
 
 #list of words to remove if they start with these chars
-rmv_list = ('@', '/', 'http', '1', '3', '4', '5', '6', '7', '8', '9', '0')
+rmv_list = ('@', '/', 'http','#' '1', '3', '4', '5', '6', '7', '8', '9', '0')
 #preproccessing tweets and removing stop words and punctuation
 ##still working on removeing @
-for x in range(len(json_load)):
+for x in range(1):
     text = json_load[x]["Source of Tweet"]
 
     #removes links, twitter handles, and random words that start with numbers
@@ -51,16 +54,30 @@ for x in range(len(json_load)):
     ]
 
     #checks for english words // not sure to add because removes some real english words // about 20k words are removed
-    #tokens_without_sw = [
-    #   w for w in tokens_without_sw if w.lower() in words or not w.isalpha()
-    #]
+    tokens_without_sw = [
+       w for w in tokens_without_sw if w.lower() in words or not w.isalpha()
+    ]
     for i in tokens_without_sw:
         for j in tokens_without_sw:
             G.add_edge(i,j)
-
+G.remove_edges_from(nx.selfloop_edges(G))
 print(G.number_of_nodes())
-nx.draw(G)
-plt.savefig("graph.png")
+
+options = {
+    "font_size": 6,
+    "node_size": 700,
+    "node_color": "white",
+    "edgecolors": "black",
+    "linewidths": 1,
+    "width": 1,
+}
+nx.draw_networkx(G,**options)
+
+ax = plt.gca()
+ax.margins(0.10)
+plt.axis("off")
+plt.show()
+print(G.number_of_nodes())
 #total=total + len(tokens_without_sw)
 #print(total)
 #print(tokens_without_sw)
